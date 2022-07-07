@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Button, Image, Text, View, SafeAreaView, ScrollView, FlatList, TouchableOpacity } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 var breedId = '1';
-var imgUrl = '';
 
 function InfoHome({ navigation }) {
     const [data, setData] = useState([]);
@@ -35,7 +34,7 @@ function InfoHome({ navigation }) {
                 keyExtractor={({ id }, index) => id}
                 renderItem={({ item }) => (
                     <View>
-                        <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('Details'); breedId = item.id; imgUrl = JSON.stringify(item.image.url) }}>
+                        <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('Details'); breedId = item.id;}}>
                             <Text>{item.name}</Text>
                             <Image
                                 style={{ width: 50, height: 50, }}
@@ -50,6 +49,7 @@ function InfoHome({ navigation }) {
 
 function BreedDetail({ navigation }) {
     const [data, setData] = useState([]);
+    const [data2, setData2] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const getDetails = async () => {
@@ -59,8 +59,11 @@ function BreedDetail({ navigation }) {
             });
             const json = await response.json();
             setData(json);
-            console.log(imgUrl)
-            console.log(typeof (imgUrl))
+            const response2 = await fetch('https://api.thedogapi.com/v1/images/search?breed_id=' + breedId, {
+                headers: { 'x-api-key': '7cd9b01f-0461-4dfc-9cc4-ba41fc4ab7dc' }
+            });
+            const json2 = await response2.json();
+            setData2(json2);
         } catch (error) {
             console.error(error);
         } finally {
@@ -79,7 +82,7 @@ function BreedDetail({ navigation }) {
                 {/* <Text>Weight: {data.weight.metric} kg</Text> */}
                 {/*<Text>height: {data.height}</Text> */}
                 <Image style={{ width: 300, height: 300 }}
-                    source={{ url: imgUrl }} />
+                    source={{ url: data2.url }} />
                 <Text>{data.description}</Text>
                 <Text>bred_for: {data.bred_for}</Text>
                 <Text>breed_group: {data.breed_group}</Text>
