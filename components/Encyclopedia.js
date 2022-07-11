@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Button, Image, Text, View, SafeAreaView, ScrollView, FlatList, TouchableOpacity } from 'react-native';
+import { StyleSheet, Image, Text, View, SafeAreaView, ScrollView, FlatList, TouchableOpacity } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 var breedId = '1';
 
@@ -24,7 +24,7 @@ function InfoHome({ navigation }) {
     useEffect(() => { getBreeds() }, [])
 
     return (
-        <ScrollView>
+        <SafeAreaView style={{ flex: 1 }}>
             <Text style={{ fontSize: 30, margin: 10 }}>Find a breed</Text>
             <View style={{ margin: 10 }}>
                 <Text>All breeds:</Text>
@@ -34,7 +34,10 @@ function InfoHome({ navigation }) {
                 keyExtractor={({ id }, index) => id}
                 renderItem={({ item }) => (
                     <View>
-                        <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('Details'); breedId = item.id;}}>
+                        <TouchableOpacity style={styles.button} onPress={() => {
+                            breedId = item.id;
+                            navigation.navigate('Details');
+                        }}>
                             <Text>{item.name}</Text>
                             <Image
                                 style={{ width: 50, height: 50, }}
@@ -43,16 +46,16 @@ function InfoHome({ navigation }) {
                     </View>
                 )}
             />
-        </ScrollView>
+        </SafeAreaView>
     );
 }
 
 function BreedDetail({ navigation }) {
     const [data, setData] = useState([]);
     const [data2, setData2] = useState([]);
-    const [loading, setLoading] = useState(true);
 
     const getDetails = async () => {
+        console.log(breedId);
         try {
             const response = await fetch('https://api.thedogapi.com/v1/breeds/' + breedId, {
                 headers: { 'x-api-key': '7cd9b01f-0461-4dfc-9cc4-ba41fc4ab7dc' }
@@ -63,11 +66,9 @@ function BreedDetail({ navigation }) {
                 headers: { 'x-api-key': '7cd9b01f-0461-4dfc-9cc4-ba41fc4ab7dc' }
             });
             const json2 = await response2.json();
-            setData2(json2);
+            setData2(json2[0]);
         } catch (error) {
             console.error(error);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -79,15 +80,12 @@ function BreedDetail({ navigation }) {
             </View>
 
             <ScrollView>
-                {/* <Text>Weight: {data.weight.metric} kg</Text> */}
-                {/*<Text>height: {data.height}</Text> */}
                 <Image style={{ width: 300, height: 300 }}
-                    source={{ url: data2.url }} />
+                    source={{ uri: data2.url }} />
                 <Text>{data.description}</Text>
                 <Text>bred_for: {data.bred_for}</Text>
                 <Text>breed_group: {data.breed_group}</Text>
                 <Text>life_span: {data.life_span}</Text>
-                <Text>history: {data.history}</Text>
                 <Text>temperament: {data.temperament}</Text>
             </ScrollView>
 

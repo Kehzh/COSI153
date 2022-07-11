@@ -1,19 +1,35 @@
 import React, { useState } from 'react';
 import { StyleSheet, Button, Text, View, SafeAreaView, TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import DatePicker from 'react-native-date-picker';
+import DatePicker from "react-native-modal-datetime-picker";
 import { useValue } from './ValueStorageContext';
 
-function AddMyDog ()  {
+
+function AddMyDog({navigation}) {
     const { currentValue, setCurrentValue } = useValue();
     const [time, setTime] = useState(currentValue.time);
     const [address, setAddress] = useState(currentValue.address);
     const [name, setName] = useState(currentValue.name);
     const [breed, setBreed] = useState(currentValue.breed);
     const [image, setImage] = useState(currentValue.image);
-    
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+    const showDatePicker = () => {
+        setDatePickerVisibility(true);
+    };
+
+    const hideDatePicker = () => {
+        setDatePickerVisibility(false);
+    };
+
+    const handleConfirm = (date) => {
+        console.log("A date has been picked: ", date);
+        setTime(date);
+        hideDatePicker();
+    };
+
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
             <Text style={{ fontSize: 12 }}>
                 Enter the info of your dog
             </Text>
@@ -30,7 +46,7 @@ function AddMyDog ()  {
                     }}
                     value={name}
                 />
-                
+
                 <TextInput
                     style={{ fontSize: 20 }}
                     placeholder="Address"
@@ -48,7 +64,7 @@ function AddMyDog ()  {
                     }}
                     value={breed}
                 />
-                
+
                 <TextInput
                     style={{ fontSize: 20 }}
                     placeholder="Image"
@@ -57,27 +73,30 @@ function AddMyDog ()  {
                     }}
                     value={image}
                 />
-                <DatePicker date={time} mode="datetime" onDateChange={setTime} />
 
+                <Button title="Show Date Picker" onPress={showDatePicker} />
+                <DatePicker
+                    isVisible={isDatePickerVisible}
+                    mode="date"
+                    onConfirm={handleConfirm}
+                    onCancel={hideDatePicker}
+                />
             </View>
             <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-around'
             }}>
                 <Button
-                    title={"publish"}
+                    title={"save"}
                     color="blue"
                     onPress={() => {
                         setCurrentValue({ name, address, breed, image, time })
-                        setName("")
-                        setAddress("")
-                        setImage("")
-                        setBreed("")
-                        setTime(new Date())
+                        console.log("context stored");
+                        navigation.navigate("All missing dogs")
                     }}
                 />
             </View>
-        </SafeAreaView>
+        </View>
     )
 }
 
